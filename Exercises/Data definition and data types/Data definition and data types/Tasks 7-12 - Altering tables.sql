@@ -1,0 +1,80 @@
+Use Minions
+GO
+CREATE TABLE People
+(
+Id INT PRIMARY KEY IDENTITY NOT NULL,
+NAME NVARCHAR(200) NOT NULL,
+Picture VARBINARY(MAX),
+Height NUMERIC(15,2),
+Weight NUMERIC(15,2),
+Gender BIT NOT NULL,
+Birthdate DATE NOT NULL,
+Biography NVARCHAR(MAX) 
+)
+GO
+ALTER TABLE People 
+ADD CONSTRAINT CHK_PictureSize
+CHECK (DATALENGTH(Picture) <= 16000000)
+
+INSERT INTO People (NAME, Gender, Birthdate)
+VALUES 
+('Svetlin Nakov', 1, '2018-01-01'),
+('Ivaylo Kenov', 1, '2018-01-02'),
+('Ivan Ivanov', 1, '2018-01-03'),
+('Vladimir Damyanovski', 1, '2018-01-04'),
+('Ivan Yonkov', 1, '2018-01-05')
+
+CREATE TABLE Users
+(
+Id BIGINT IDENTITY NOT NULL,
+Username VARCHAR(30) UNIQUE NOT NULL,
+Password VARCHAR(26) NOT NULL,
+ProfilePicture VARBINARY(MAX),
+LastLoginTime SMALLDATETIME,
+IsDeleted BIT,
+)
+
+ALTER TABLE Users 
+ADD CONSTRAINT CHK_ProfilePictureSize
+CHECK (DATALENGTH(ProfilePicture) <= (900 * 1024))
+
+ALTER TABLE Users 
+ADD CONSTRAINT PK_Id
+PRIMARY KEY (Id)
+
+INSERT INTO Users (Username, Password, IsDeleted)
+VALUES 
+('Svetlio', '123', 1),
+('Ivo', '123', 1),
+('Vlado', '123', 1),
+('Rado', '123', 0),
+('Ivan', '123', 1)
+
+ALTER TABLE Users
+DROP CONSTRAINT PK_Id
+
+ALTER TABLE Users
+ADD CONSTRAINT PK_User
+PRIMARY KEY (Id, Username)
+
+ALTER TABLE Users
+ADD CONSTRAINT CHK_MinPasswordSize
+CHECK (DATALENGTH(Password) >= 5) 
+
+ALTER TABLE Users 
+ADD DEFAULT GETDATE() FOR LastLoginTime
+
+ALTER TABLE Users
+DROP CONSTRAINT PK_User
+
+ALTER TABLE Users 
+ADD CONSTRAINT PK_Id
+PRIMARY KEY (Id)
+
+ALTER TABLE Users
+ADD CONSTRAINT UNQ_Username
+UNIQUE (Username)
+
+ALTER TABLE Users
+ADD CONSTRAINT CHK_UsernameMinStringSize
+CHECK (DATALENGTH(Username) >= 3)
